@@ -12,7 +12,7 @@ unset($_SESSION['signup_error']);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="/AIUB_Library_Management_System/assets/css/style.css" />
     <style>
-        .login-wrap{max-width:420px;padding:40px;margin:40px auto;}
+        .login-wrap{max-width:420px;margin:40px auto;}
         .login-title{margin:0 0 10px 0;}
         .inline-btn{width:auto;padding:10px 16px;}
         .small-text{margin-top:12px;font-size:14px;}
@@ -39,6 +39,10 @@ unset($_SESSION['signup_error']);
         <form method="post" action="../../controllers/signupCheck.php">
             <label>Username</label>
             <input type="text" name="username" required />
+            <br><br>
+
+            <label>Email</label>
+            <input type="email" name="email" required />
             <br><br>
 
             <label>Password</label>

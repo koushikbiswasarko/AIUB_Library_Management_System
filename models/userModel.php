@@ -1,6 +1,10 @@
 <?php
 require_once('db.php');
 
+// NOTE (for WebTech class):
+// This project uses simple mysqli_query() (no bind_param / prepared statements)
+// because many course templates don't cover prepared statements yet.
+
 function login($user){
     $databaseConnection = getConnection();
 
@@ -11,28 +15,28 @@ function login($user){
         return false;
     }
 
-    $sqlQuery = "SELECT * FROM users WHERE username = ? AND password = ? LIMIT 1";
-    $statement = mysqli_prepare($databaseConnection, $sqlQuery);
+    $safeUserName = mysqli_real_escape_string($databaseConnection, $userName);
+    $safePassword = mysqli_real_escape_string($databaseConnection, $userPassword);
 
-    mysqli_stmt_bind_param($statement, "ss", $userName, $userPassword);
-    mysqli_stmt_execute($statement);
-
-    $result = mysqli_stmt_get_result($statement);
+    $sqlQuery = "SELECT * FROM users WHERE username='$safeUserName' AND password='$safePassword' LIMIT 1";
+    $result = mysqli_query($databaseConnection, $sqlQuery);
 
     if ($result && mysqli_num_rows($result) === 1) {
-        $userData = mysqli_fetch_assoc($result);
-        mysqli_stmt_close($statement);
-        return $userData;
+        return mysqli_fetch_assoc($result);
     }
 
-    mysqli_stmt_close($statement);
     return false;
 }
 
 function getAllStudents(){
     $databaseConnection = getConnection();
+    $sqlQuery = "SELECT id, username FROM users WHERE role='student' ORDER BY username ASC";
+    return mysqli_query($databaseConnection, $sqlQuery);
+}
 
-    $sqlQuery = "SELECT id, username FROM users WHERE role = 'student' ORDER BY username ASC";
+function getAllUsers(){
+    $databaseConnection = getConnection();
+    $sqlQuery = "SELECT id, username, email, role FROM users ORDER BY id DESC";
     return mysqli_query($databaseConnection, $sqlQuery);
 }
 
@@ -44,22 +48,19 @@ function isUsernameTaken($username){
         return true;
     }
 
-    $sqlQuery = "SELECT id FROM users WHERE username = ? LIMIT 1";
-    $statement = mysqli_prepare($databaseConnection, $sqlQuery);
-    mysqli_stmt_bind_param($statement, "s", $userName);
-    mysqli_stmt_execute($statement);
-    $result = mysqli_stmt_get_result($statement);
+    $safeUserName = mysqli_real_escape_string($databaseConnection, $userName);
+    $sqlQuery = "SELECT id FROM users WHERE username='$safeUserName' LIMIT 1";
+    $result = mysqli_query($databaseConnection, $sqlQuery);
 
-    $isTaken = ($result && mysqli_num_rows($result) > 0);
-    mysqli_stmt_close($statement);
-    return $isTaken;
+    return ($result && mysqli_num_rows($result) > 0);
 }
 
-function createUser($username, $password, $role){
+function createUser($username, $password, $email, $role){
     $databaseConnection = getConnection();
 
     $userName = trim($username ?? "");
     $userPassword = trim($password ?? "");
+    $userEmail = trim($email ?? "");
     $userRole = trim($role ?? "student");
 
     if ($userName === "" || $userPassword === "") {
@@ -72,13 +73,14 @@ function createUser($username, $password, $role){
         $userRole = 'student';
     }
 
-    $sqlQuery = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
-    $statement = mysqli_prepare($databaseConnection, $sqlQuery);
-    mysqli_stmt_bind_param($statement, "sss", $userName, $userPassword, $userRole);
-    $ok = mysqli_stmt_execute($statement);
-    mysqli_stmt_close($statement);
+    $safeUserName = mysqli_real_escape_string($databaseConnection, $userName);
+    $safePassword = mysqli_real_escape_string($databaseConnection, $userPassword);
+    $safeEmail = mysqli_real_escape_string($databaseConnection, $userEmail);
+    $safeRole = mysqli_real_escape_string($databaseConnection, $userRole);
 
-    return $ok;
+    // IMPORTANT: Your users table must have an email column.
+    $sqlQuery = "INSERT INTO users (username, password, email, role) VALUES ('$safeUserName', '$safePassword', '$safeEmail', '$safeRole')";
+    return mysqli_query($databaseConnection, $sqlQuery);
 }
 
 function updatePasswordByUsername($username, $newPassword){
@@ -90,13 +92,39 @@ function updatePasswordByUsername($username, $newPassword){
         return false;
     }
 
-    $sqlQuery = "UPDATE users SET password = ? WHERE username = ?";
-    $statement = mysqli_prepare($databaseConnection, $sqlQuery);
-    mysqli_stmt_bind_param($statement, "ss", $password, $userName);
-    $ok = mysqli_stmt_execute($statement);
-    $affected = mysqli_stmt_affected_rows($statement);
-    mysqli_stmt_close($statement);
+    $safeUserName = mysqli_real_escape_string($databaseConnection, $userName);
+    $safePassword = mysqli_real_escape_string($databaseConnection, $password);
+
+    $sqlQuery = "UPDATE users SET password='$safePassword' WHERE username='$safeUserName'";
+    $ok = mysqli_query($databaseConnection, $sqlQuery);
+    $affected = mysqli_affected_rows($databaseConnection);
 
     return ($ok && $affected > 0);
 }
+
+function deleteUserById($userId){
+    $databaseConnection = getConnection();
+    $id = (int)($userId ?? 0);
+    if ($id <= 0) {
+        return false;
+    }
+    $sqlQuery = "DELETE FROM users WHERE id=$id";
+    return mysqli_query($databaseConnection, $sqlQuery);
+}
+
+function updateUserRoleById($userId, $newRole){
+    $databaseConnection = getConnection();
+
+    $id = (int)($userId ?? 0);
+    $role = trim($newRole ?? "");
+    $allowedRoles = ['student', 'librarian', 'admin'];
+    if ($id <= 0 || !in_array($role, $allowedRoles, true)) {
+        return false;
+    }
+
+    $safeRole = mysqli_real_escape_string($databaseConnection, $role);
+    $sqlQuery = "UPDATE users SET role='$safeRole' WHERE id=$id";
+    return mysqli_query($databaseConnection, $sqlQuery);
+}
+
 ?>

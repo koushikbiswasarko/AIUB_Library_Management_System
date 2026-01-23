@@ -1,6 +1,8 @@
 <?php
 require_once('db.php');
 
+// Simple mysqli_query() versions (no bind_param)
+
 function getAllBooks(){
     $databaseConnection = getConnection();
     $sqlQuery = "SELECT * FROM books ORDER BY id DESC";
@@ -15,82 +17,79 @@ function getAllBooksForIssue(){
 
 function getBookById($bookId){
     $databaseConnection = getConnection();
+    $id = (int)($bookId ?? 0);
+    if ($id <= 0) {
+        return null;
+    }
 
-    $sqlQuery = "SELECT * FROM books WHERE id = ?";
-    $statement = mysqli_prepare($databaseConnection, $sqlQuery);
-
-    $bookIdInteger = intval($bookId);
-    mysqli_stmt_bind_param($statement, "i", $bookIdInteger);
-
-    mysqli_stmt_execute($statement);
-    $result = mysqli_stmt_get_result($statement);
-
-    $bookData = mysqli_fetch_assoc($result);
-    mysqli_stmt_close($statement);
-
-    return $bookData;
+    $sqlQuery = "SELECT * FROM books WHERE id=$id LIMIT 1";
+    $result = mysqli_query($databaseConnection, $sqlQuery);
+    if ($result && mysqli_num_rows($result) === 1) {
+        return mysqli_fetch_assoc($result);
+    }
+    return null;
 }
 
 function addBook($bookData){
     $databaseConnection = getConnection();
 
-    $sqlQuery = "INSERT INTO books (title, author, category, total_copies, available_copies)
-                VALUES (?, ?, ?, ?, ?)";
-    $statement = mysqli_prepare($databaseConnection, $sqlQuery);
-
     $bookTitle = trim($bookData['title'] ?? "");
     $authorName = trim($bookData['author'] ?? "");
     $bookCategory = trim($bookData['category'] ?? "");
-    $totalCopies = intval($bookData['total_copies'] ?? 0);
-    $availableCopies = intval($bookData['available_copies'] ?? 0);
+    $totalCopies = (int)($bookData['total_copies'] ?? 0);
+    $availableCopies = (int)($bookData['available_copies'] ?? 0);
 
-    mysqli_stmt_bind_param($statement, "sssii", $bookTitle, $authorName, $bookCategory, $totalCopies, $availableCopies);
+    if ($bookTitle === "" || $authorName === "" || $bookCategory === "") {
+        return false;
+    }
 
-    $isInserted = mysqli_stmt_execute($statement);
-    mysqli_stmt_close($statement);
+    $safeTitle = mysqli_real_escape_string($databaseConnection, $bookTitle);
+    $safeAuthor = mysqli_real_escape_string($databaseConnection, $authorName);
+    $safeCategory = mysqli_real_escape_string($databaseConnection, $bookCategory);
 
-    return $isInserted;
+    $sqlQuery = "INSERT INTO books (title, author, category, total_copies, available_copies)
+                VALUES ('$safeTitle', '$safeAuthor', '$safeCategory', $totalCopies, $availableCopies)";
+
+    return mysqli_query($databaseConnection, $sqlQuery);
 }
 
 function updateBook($bookData){
     $databaseConnection = getConnection();
 
-    $sqlQuery = "UPDATE books SET
-                    title = ?,
-                    author = ?,
-                    category = ?,
-                    total_copies = ?,
-                    available_copies = ?
-                WHERE id = ?";
-    $statement = mysqli_prepare($databaseConnection, $sqlQuery);
-
-    $bookId = intval($bookData['id'] ?? 0);
+    $bookId = (int)($bookData['id'] ?? 0);
     $bookTitle = trim($bookData['title'] ?? "");
     $authorName = trim($bookData['author'] ?? "");
     $bookCategory = trim($bookData['category'] ?? "");
-    $totalCopies = intval($bookData['total_copies'] ?? 0);
-    $availableCopies = intval($bookData['available_copies'] ?? 0);
+    $totalCopies = (int)($bookData['total_copies'] ?? 0);
+    $availableCopies = (int)($bookData['available_copies'] ?? 0);
 
-    mysqli_stmt_bind_param($statement, "sssiii", $bookTitle, $authorName, $bookCategory, $totalCopies, $availableCopies, $bookId);
+    if ($bookId <= 0 || $bookTitle === "" || $authorName === "" || $bookCategory === "") {
+        return false;
+    }
 
-    $isUpdated = mysqli_stmt_execute($statement);
-    mysqli_stmt_close($statement);
+    $safeTitle = mysqli_real_escape_string($databaseConnection, $bookTitle);
+    $safeAuthor = mysqli_real_escape_string($databaseConnection, $authorName);
+    $safeCategory = mysqli_real_escape_string($databaseConnection, $bookCategory);
 
-    return $isUpdated;
+    $sqlQuery = "UPDATE books SET
+                    title='$safeTitle',
+                    author='$safeAuthor',
+                    category='$safeCategory',
+                    total_copies=$totalCopies,
+                    available_copies=$availableCopies
+                WHERE id=$bookId";
+
+    return mysqli_query($databaseConnection, $sqlQuery);
 }
 
 function deleteBook($bookId){
     $databaseConnection = getConnection();
-
-    $sqlQuery = "DELETE FROM books WHERE id = ?";
-    $statement = mysqli_prepare($databaseConnection, $sqlQuery);
-
-    $bookIdInteger = intval($bookId);
-    mysqli_stmt_bind_param($statement, "i", $bookIdInteger);
-
-    $isDeleted = mysqli_stmt_execute($statement);
-    mysqli_stmt_close($statement);
-
-    return $isDeleted;
+    $id = (int)($bookId ?? 0);
+    if ($id <= 0) {
+        return false;
+    }
+    $sqlQuery = "DELETE FROM books WHERE id=$id";
+    return mysqli_query($databaseConnection, $sqlQuery);
 }
+
 ?>

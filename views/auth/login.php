@@ -12,7 +12,6 @@ unset($_SESSION['signup_success']);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="/AIUB_Library_Management_System/assets/css/style.css" />
     <style>
-        /* Small page-specific tweaks (keeps main CSS simple) */
         .login-wrap{max-width:420px;padding:40px;margin:40px auto;}
         .login-title{margin:0 0 10px 0;}
         .hint{font-size:14px;color:gray;margin-top:10px;}
@@ -51,7 +50,6 @@ unset($_SESSION['signup_success']);
         </form>
 
         <div class="auth-links">
-            <a href="forgot_password.php">Forgot password?</a>
             <a href="signup.php">Create new account</a>
         </div>
 

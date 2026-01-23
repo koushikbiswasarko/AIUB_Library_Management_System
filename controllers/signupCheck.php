@@ -9,14 +9,21 @@ if (!isset($_POST['submit'])) {
 }
 
 $userName = trim($_POST['username'] ?? "");
+$userEmail = trim($_POST['email'] ?? "");
 $userPassword = trim($_POST['password'] ?? "");
 $confirmPassword = trim($_POST['confirm_password'] ?? "");
 
 // For this project: students can self-register.
 $userRole = 'student';
 
-if ($userName === "" || $userPassword === "" || $confirmPassword === "") {
+if ($userName === "" || $userEmail === "" || $userPassword === "" || $confirmPassword === "") {
     $_SESSION['signup_error'] = 'Please fill in all fields.';
+    header('location: ../views/auth/signup.php');
+    exit();
+}
+
+if (!filter_var($userEmail, FILTER_VALIDATE_EMAIL)) {
+    $_SESSION['signup_error'] = 'Invalid email format.';
     header('location: ../views/auth/signup.php');
     exit();
 }
@@ -39,7 +46,7 @@ if (isUsernameTaken($userName)) {
     exit();
 }
 
-$created = createUser($userName, $userPassword, $userRole);
+$created = createUser($userName, $userPassword, $userEmail, $userRole);
 
 if ($created) {
     $_SESSION['signup_success'] = 'Account created successfully! Please login.';
