@@ -1,0 +1,42 @@
+<?php
+require_once('../../controllers/roleCheck.php');
+requireRole('admin');
+require_once('../partials/header.php');
+?>
+
+<div style="display:flex; gap:15px;">
+  <div style="width:250px;">
+    <?php require_once('../partials/adminMenu.php'); ?>
+  </div>
+
+  <div style="flex:1;">
+    <div class="box">
+      <h2>Add Book</h2>
+      <p>Fill the form to add a new book.</p>
+    </div>
+
+    <div class="box">
+      <form method="post" action="../../controllers/bookAddCheck.php">
+        <label>Book Title</label>
+        <input type="text" name="title" required>
+        <br><br>
+
+        <label>Author Name</label>
+        <input type="text" name="author" required>
+        <br><br>
+
+        <label>Category</label>
+        <input type="text" name="category">
+        <br><br>
+
+        <label>Total Copies</label>
+        <input type="number" name="total_copies" value="1" min="1" required>
+        <br><br>
+
+        <button type="submit" name="submit">Add Book</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<?php require_once('../partials/footer.php'); ?>

@@ -6,7 +6,14 @@ $dbpass = "";
 
 function getConnection(){
     global $host, $dbname, $dbuser, $dbpass;
-    $con = mysqli_connect($host, $dbuser, $dbpass, $dbname);
-    return $con;
+
+    $databaseConnection = mysqli_connect($host, $dbuser, $dbpass, $dbname);
+
+    if (!$databaseConnection) {
+        die("Database connection failed!");
+    }
+
+    mysqli_set_charset($databaseConnection, "utf8");
+    return $databaseConnection;
 }
 ?>

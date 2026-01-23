@@ -1,0 +1,102 @@
+body {
+  font-family: Arial;
+  margin: 0;
+  background-color: #f2f2f2;
+  color: black;
+}
+
+.top {
+  background-color: #0d6efd;
+  color: white;
+  padding: 12px;
+}
+
+.container {
+  width: 90%;
+  margin: 15px auto;
+}
+
+.box {
+  background-color: white;
+  border: 1px solid #cccccc;
+  padding: 15px;
+  margin-bottom: 12px;
+  border-radius: 5px;
+}
+
+.menu a {
+  display: block;
+  padding: 10px;
+  margin-top: 6px;
+  background-color: white;
+  border: 1px solid #cccccc;
+  text-decoration: none;
+  color: black;
+  border-radius: 5px;
+}
+
+.menu a:hover {
+  background-color: #e6f0ff;
+}
+
+.stat {
+  display: inline-block;
+  width: 220px;
+  background-color: white;
+  border: 1px solid #cccccc;
+  padding: 12px;
+  margin: 6px;
+  border-radius: 5px;
+}
+
+.stat h2 {
+  margin: 0;
+}
+
+.stat p {
+  margin-top: 5px;
+  color: gray;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+}
+
+th, td {
+  border: 1px solid #cccccc;
+  padding: 10px;
+}
+
+th {
+  background-color: black;
+  color: white;
+}
+
+input, select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #cccccc;
+  border-radius: 5px;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background-color: #0d6efd;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0b5ed7;
+}
+
+.footer {
+  text-align: center;
+  padding: 15px;
+  color: gray;
+}
