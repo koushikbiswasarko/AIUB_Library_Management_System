@@ -1,19 +1,10 @@
 <?php
 require_once('../../controllers/roleCheck.php');
 requireRole('librarian');
-require_once('../../models/db.php');
 
-$conn = getConnection();
+require_once('../../models/borrowModel.php');
 
-$sql = "
-  SELECT br.id AS borrowing_id, br.due_date, u.username, b.title
-  FROM borrowings br
-  JOIN users u ON br.user_id = u.id
-  JOIN books b ON br.book_id = b.id
-  WHERE br.status='issued'
-  ORDER BY br.due_date ASC
-";
-$result = mysqli_query($conn, $sql);
+$result = getIssuedList();
 
 require_once('../partials/header.php');
 ?>
@@ -42,7 +33,7 @@ require_once('../partials/header.php');
               <td><?php echo $row['due_date']; ?></td>
               <td>
                 <form method="post" action="../../controllers/returnCheck.php" style="margin:0;">
-                  <input type="hidden" name="borrow_id" value="<?php echo $row['borrowing_id']; ?>">
+                  <input type="hidden" name="borrow_id" value="<?php echo $row['id']; ?>">
                   <button type="submit" name="submit">Return</button>
                 </form>
               </td>

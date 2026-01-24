@@ -14,7 +14,7 @@ require_once('../partials/header.php');
   <div style="flex:1;">
     <div class="box">
       <h2>Manage Books</h2>
-      <button onclick="location.href='addbook.php'">Add Book</button>
+      <button onclick="location.href='addBook.php'">Add Book</button>
     </div>
 
     <div class="box">
@@ -39,7 +39,7 @@ require_once('../partials/header.php');
           <td><?php echo $b['total_copies']; ?></td>
           <td><?php echo $b['available_copies']; ?></td>
           <td>
-            <button onclick="location.href='editbook.php?id=<?php echo $b['id']; ?>'">Edit</button>
+            <button onclick="location.href='editBook.php?id=<?php echo $b['id']; ?>'">Edit</button>
             <br><br>
             <deletebutton 
             onclick="if(confirm('&#9888; Warning: Are you sure you want to delete this book? This action cannot be undone.')) {

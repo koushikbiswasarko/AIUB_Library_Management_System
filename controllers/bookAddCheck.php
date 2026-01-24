@@ -4,7 +4,7 @@ requireRole('admin');
 require_once('../models/bookModel.php');
 
 if (!isset($_POST['submit'])) {
-    header('location: ../views/admin/addbook.php');
+    header('location: ../views/admin/addBook.php');
     exit();
 }
 
@@ -29,7 +29,7 @@ $bookData = [
 $isAdded = addBook($bookData);
 
 if ($isAdded) {
-    header('location: ../views/admin/booklist.php');
+    header('location: ../views/admin/bookList.php');
     exit();
 }
 

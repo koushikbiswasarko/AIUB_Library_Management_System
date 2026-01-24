@@ -40,6 +40,13 @@ if (isUsernameTaken($userName)) {
     exit();
 }
 
+if (isUserEmailTaken($userEmail)) {
+    $_SESSION['user_error'] = 'Email already exists. Try another one.';
+    header('location: ../views/admin/users.php');
+    exit();
+}
+
+
 $created = createUser($userName, $userPassword, $userEmail, $userRole);
 
 if ($created) {

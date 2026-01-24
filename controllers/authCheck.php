@@ -6,6 +6,6 @@ if (session_status() === PHP_SESSION_NONE) {
 $isLoggedIn = (isset($_COOKIE['status']) && $_COOKIE['status'] === 'true');
 
 if (!$isLoggedIn) {
-    header('location: ../views/auth/login.php');
+    header("Location: /AIUB_Library_Management_System/views/auth/login.php");
     exit();
 }

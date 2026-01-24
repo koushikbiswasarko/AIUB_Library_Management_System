@@ -9,6 +9,7 @@ unset($_SESSION['user_success']);
 require_once('../partials/header.php');
 ?>
 
+
 <div style="display:flex; gap:15px;">
   <div style="width:250px;">
     <?php require_once('../partials/adminMenu.php'); ?>

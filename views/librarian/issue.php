@@ -2,14 +2,12 @@
 require_once('../../controllers/roleCheck.php');
 requireRole('librarian');
 
-require_once('../../models/db.php');
+require_once('../../models/userModel.php');
+require_once('../../models/bookModel.php');
 
-$conn = getConnection();
-
-$students = mysqli_query($conn, "SELECT id, username FROM users WHERE role='student' ORDER BY username ASC");
-$booksForSelect = mysqli_query($conn, "SELECT id, title, author, category, total_copies, available_copies FROM books ORDER BY title ASC");
-
-$allBooks = mysqli_query($conn, "SELECT id, title, author, category, total_copies, available_copies FROM books ORDER BY title ASC");
+$students = getAllStudents();
+$booksForSelect = getAllBooksForIssue();
+$allBooks = getAllBooks();
 
 require_once('../partials/header.php');
 ?>
@@ -53,6 +51,7 @@ require_once('../partials/header.php');
             <option value="<?php echo $s['id']; ?>"><?php echo htmlspecialchars($s['username']); ?></option>
           <?php } ?>
         </select>
+
         <label style="padding:5px">Book</label>
         <select name="book_id" required style="width:40%; padding:8px;">
           <?php while($bk = mysqli_fetch_assoc($booksForSelect)){ ?>
@@ -61,6 +60,7 @@ require_once('../partials/header.php');
             </option>
           <?php } ?>
         </select>
+
         <label style="padding:5px"> Due Date</label>
         <input type="date" name="due_date" required style="width:15%; padding:8px;">
         <br><br>
