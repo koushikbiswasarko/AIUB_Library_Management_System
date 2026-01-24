@@ -1,14 +1,13 @@
 <?php
 if(session_status() === PHP_SESSION_NONE){
-    session_start();
+  session_start();
 }
 ?>
 <!DOCTYPE html>
 <html>
 <head>
   <title>AIUB Library Management System</title>
-  <!-- Keep this path consistent with your XAMPP folder name inside htdocs -->
-  <link rel="stylesheet" href="/AIUB_Library_Management_System/assets/css/style.css">
+  <link rel="stylesheet" href="../../assets/css/style.css">
 </head>
 <body>
 
@@ -17,8 +16,8 @@ if(session_status() === PHP_SESSION_NONE){
 
   <?php if(isset($_SESSION['username'])){ ?>
     <span style="float:right;">
-      <?= $_SESSION['username'] ?> (<?= $_SESSION['role'] ?>)
-      | <a href="/AIUB_Library_Management_System/controllers/logout.php" style="color:white;">Logout</a>
+      <?php echo $_SESSION['username']; ?> (<?php echo $_SESSION['role']; ?>)
+      | <a href="../../controllers/logout.php" style="color:white;">Logout</a>
     </span>
   <?php } ?>
 </div>

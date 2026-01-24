@@ -5,6 +5,11 @@ require_once('../../models/db.php');
 
 $databaseConnection = getConnection();
 
+$totalBooksQuery = "SELECT COUNT(*) AS total_books FROM books";
+$totalBooksResult = mysqli_query($databaseConnection, $totalBooksQuery);
+$totalBooksRow = mysqli_fetch_assoc($totalBooksResult);
+$totalBooks = $totalBooksRow['total_books'];
+
 $issuedBooksQuery = "SELECT COUNT(*) AS issued_books FROM borrowings WHERE status='issued'";
 $issuedBooksResult = mysqli_query($databaseConnection, $issuedBooksQuery);
 $issuedBooksRow = mysqli_fetch_assoc($issuedBooksResult);
@@ -30,12 +35,17 @@ require_once('../partials/header.php');
     </div>
 
     <div class="stat">
-      <h2><?= $issuedBooks ?></h2>
+      <h2><?php echo $totalBooks; ?></h2>
+      <p>Total Books</p>
+    </div>
+
+    <div class="stat">
+      <h2><?php echo $issuedBooks; ?></h2>
       <p>Issued Books</p>
     </div>
 
     <div class="stat">
-      <h2><?= $overdueBooks ?></h2>
+      <h2><?php echo $overdueBooks; ?></h2>
       <p>Overdue Books</p>
     </div>
   </div>

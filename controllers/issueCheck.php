@@ -1,6 +1,7 @@
 <?php
 require_once('roleCheck.php');
 requireRole('librarian');
+
 require_once('../models/borrowModel.php');
 
 if (!isset($_POST['submit'])) {
@@ -8,8 +9,9 @@ if (!isset($_POST['submit'])) {
     exit();
 }
 
-$userId = intval($_POST['user_id'] ?? 0);
-$bookId = intval($_POST['book_id'] ?? 0);
+$userId = (int)($_POST['user_id'] ?? 0);
+$bookId = (int)($_POST['book_id'] ?? 0);
+$dueDate = trim($_POST['due_date'] ?? '');
 
 if ($userId <= 0 || $bookId <= 0) {
     echo "Invalid input!";
@@ -17,11 +19,14 @@ if ($userId <= 0 || $bookId <= 0) {
 }
 
 $issueDate = date('Y-m-d');
-$dueDate = date('Y-m-d', strtotime('+7 days'));
 
-$isIssued = issueBook($userId, $bookId, $issueDate, $dueDate);
+if ($dueDate === '') {
+    $dueDate = date('Y-m-d', strtotime('+7 days'));
+}
 
-if ($isIssued) {
+$ok = issueBook($userId, $bookId, $issueDate, $dueDate);
+
+if ($ok) {
     header('location: ../views/librarian/dashboard.php');
     exit();
 }

@@ -3,22 +3,16 @@ require_once('../../controllers/roleCheck.php');
 requireRole('admin');
 require_once('../../models/db.php');
 
-$databaseConnection = getConnection();
+$conn = getConnection();
 
-$totalBooksQuery = "SELECT COUNT(*) AS total_books FROM books";
-$totalBooksResult = mysqli_query($databaseConnection, $totalBooksQuery);
-$totalBooksRow = mysqli_fetch_assoc($totalBooksResult);
-$totalBooks = $totalBooksRow['total_books'];
+$r1 = mysqli_query($conn, "SELECT COUNT(*) AS c FROM books");
+$a = mysqli_fetch_assoc($r1);
 
-$issuedBooksQuery = "SELECT COUNT(*) AS issued_books FROM borrowings WHERE status='issued'";
-$issuedBooksResult = mysqli_query($databaseConnection, $issuedBooksQuery);
-$issuedBooksRow = mysqli_fetch_assoc($issuedBooksResult);
-$issuedBooks = $issuedBooksRow['issued_books'];
+$r2 = mysqli_query($conn, "SELECT COUNT(*) AS c FROM borrowings WHERE status='issued'");
+$b = mysqli_fetch_assoc($r2);
 
-$overdueBooksQuery = "SELECT COUNT(*) AS overdue_books FROM borrowings WHERE status='issued' AND due_date < CURDATE()";
-$overdueBooksResult = mysqli_query($databaseConnection, $overdueBooksQuery);
-$overdueBooksRow = mysqli_fetch_assoc($overdueBooksResult);
-$overdueBooks = $overdueBooksRow['overdue_books'];
+$r3 = mysqli_query($conn, "SELECT COUNT(*) AS c FROM borrowings WHERE status='issued' AND due_date < CURDATE()");
+$c = mysqli_fetch_assoc($r3);
 
 require_once('../partials/header.php');
 ?>
@@ -35,17 +29,17 @@ require_once('../partials/header.php');
     </div>
 
     <div class="stat">
-      <h2><?= $totalBooks ?></h2>
+      <h2><?php echo $a['c']; ?></h2>
       <p>Total Books</p>
     </div>
 
     <div class="stat">
-      <h2><?= $issuedBooks ?></h2>
+      <h2><?php echo $b['c']; ?></h2>
       <p>Issued Books</p>
     </div>
 
     <div class="stat">
-      <h2><?= $overdueBooks ?></h2>
+      <h2><?php echo $c['c']; ?></h2>
       <p>Overdue Books</p>
     </div>
   </div>

@@ -1,95 +1,89 @@
 <?php
 require_once('db.php');
 
-// Simple mysqli_query() versions (no bind_param)
-
 function getAllBooks(){
-    $databaseConnection = getConnection();
-    $sqlQuery = "SELECT * FROM books ORDER BY id DESC";
-    return mysqli_query($databaseConnection, $sqlQuery);
+    $conn = getConnection();
+    $sql = "SELECT * FROM books ORDER BY title ASC";
+    return mysqli_query($conn, $sql);
 }
 
 function getAllBooksForIssue(){
-    $databaseConnection = getConnection();
-    $sqlQuery = "SELECT id, title, available_copies FROM books ORDER BY id DESC";
-    return mysqli_query($databaseConnection, $sqlQuery);
+    $conn = getConnection();
+    $sql = "SELECT id, title, available_copies FROM books ORDER BY title ASC";
+    return mysqli_query($conn, $sql);
 }
 
-function getBookById($bookId){
-    $databaseConnection = getConnection();
-    $id = (int)($bookId ?? 0);
-    if ($id <= 0) {
+function getBook($bookId){
+    $conn = getConnection();
+
+    $id = (int)$bookId;
+    if($id <= 0){
         return null;
     }
 
-    $sqlQuery = "SELECT * FROM books WHERE id=$id LIMIT 1";
-    $result = mysqli_query($databaseConnection, $sqlQuery);
-    if ($result && mysqli_num_rows($result) === 1) {
+    $sql = "SELECT * FROM books WHERE id=$id";
+    $result = mysqli_query($conn, $sql);
+
+    if($result && mysqli_num_rows($result) == 1){
         return mysqli_fetch_assoc($result);
     }
+
     return null;
 }
 
 function addBook($bookData){
-    $databaseConnection = getConnection();
+    $conn = getConnection();
 
-    $bookTitle = trim($bookData['title'] ?? "");
-    $authorName = trim($bookData['author'] ?? "");
-    $bookCategory = trim($bookData['category'] ?? "");
-    $totalCopies = (int)($bookData['total_copies'] ?? 0);
-    $availableCopies = (int)($bookData['available_copies'] ?? 0);
+    $title = $bookData['title'];
+    $author = $bookData['author'];
+    $category = $bookData['category'];
+    $total = (int)$bookData['total_copies'];
+    $available = (int)$bookData['available_copies'];
 
-    if ($bookTitle === "" || $authorName === "" || $bookCategory === "") {
+    if($title == "" || $author == "" || $category == ""){
         return false;
     }
 
-    $safeTitle = mysqli_real_escape_string($databaseConnection, $bookTitle);
-    $safeAuthor = mysqli_real_escape_string($databaseConnection, $authorName);
-    $safeCategory = mysqli_real_escape_string($databaseConnection, $bookCategory);
+    $sql = "INSERT INTO books (title, author, category, total_copies, available_copies)
+            VALUES ('$title', '$author', '$category', $total, $available)";
 
-    $sqlQuery = "INSERT INTO books (title, author, category, total_copies, available_copies)
-                VALUES ('$safeTitle', '$safeAuthor', '$safeCategory', $totalCopies, $availableCopies)";
-
-    return mysqli_query($databaseConnection, $sqlQuery);
+    return mysqli_query($conn, $sql);
 }
 
 function updateBook($bookData){
-    $databaseConnection = getConnection();
+    $conn = getConnection();
 
-    $bookId = (int)($bookData['id'] ?? 0);
-    $bookTitle = trim($bookData['title'] ?? "");
-    $authorName = trim($bookData['author'] ?? "");
-    $bookCategory = trim($bookData['category'] ?? "");
-    $totalCopies = (int)($bookData['total_copies'] ?? 0);
-    $availableCopies = (int)($bookData['available_copies'] ?? 0);
+    $id = (int)$bookData['id'];
+    $title = $bookData['title'];
+    $author = $bookData['author'];
+    $category = $bookData['category'];
+    $total = (int)$bookData['total_copies'];
+    $available = (int)$bookData['available_copies'];
 
-    if ($bookId <= 0 || $bookTitle === "" || $authorName === "" || $bookCategory === "") {
+    if($id <= 0 || $title == "" || $author == "" || $category == ""){
         return false;
     }
 
-    $safeTitle = mysqli_real_escape_string($databaseConnection, $bookTitle);
-    $safeAuthor = mysqli_real_escape_string($databaseConnection, $authorName);
-    $safeCategory = mysqli_real_escape_string($databaseConnection, $bookCategory);
+    $sql = "UPDATE books SET
+            title='$title',
+            author='$author',
+            category='$category',
+            total_copies=$total,
+            available_copies=$available
+            WHERE id=$id";
 
-    $sqlQuery = "UPDATE books SET
-                    title='$safeTitle',
-                    author='$safeAuthor',
-                    category='$safeCategory',
-                    total_copies=$totalCopies,
-                    available_copies=$availableCopies
-                WHERE id=$bookId";
-
-    return mysqli_query($databaseConnection, $sqlQuery);
+    return mysqli_query($conn, $sql);
 }
 
 function deleteBook($bookId){
-    $databaseConnection = getConnection();
-    $id = (int)($bookId ?? 0);
-    if ($id <= 0) {
+    $conn = getConnection();
+
+    $id = (int)$bookId;
+    if($id <= 0){
         return false;
     }
-    $sqlQuery = "DELETE FROM books WHERE id=$id";
-    return mysqli_query($databaseConnection, $sqlQuery);
-}
 
+    $sql = "DELETE FROM books WHERE id=$id";
+    return mysqli_query($conn, $sql);
+}
 ?>

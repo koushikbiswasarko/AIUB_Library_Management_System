@@ -8,7 +8,6 @@ require_once('../models/userModel.php');
 
 $id = (int)($_GET['id'] ?? 0);
 
-// Don't allow admin to delete themselves (avoid lock-out)
 if ($id <= 0) {
     $_SESSION['user_error'] = 'Invalid user id.';
     header('location: ../views/admin/users.php');
@@ -21,7 +20,7 @@ if ((int)($_SESSION['user_id'] ?? 0) === $id) {
     exit();
 }
 
-$deleted = deleteUserById($id);
+$deleted = deleteUser($id);
 
 if ($deleted) {
     $_SESSION['user_success'] = 'User deleted.';

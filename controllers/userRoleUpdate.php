@@ -20,14 +20,13 @@ if ($id <= 0 || $role === "") {
     exit();
 }
 
-// Don't let admin change own role (avoid lock-out)
 if ((int)($_SESSION['user_id'] ?? 0) === $id) {
     $_SESSION['user_error'] = "You can't change your own role.";
     header('location: ../views/admin/users.php');
     exit();
 }
 
-$updated = updateUserRoleById($id, $role);
+$updated = updateUserRole($id, $role);
 
 if ($updated) {
     $_SESSION['user_success'] = 'Role updated.';

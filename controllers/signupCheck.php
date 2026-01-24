@@ -13,7 +13,6 @@ $userEmail = trim($_POST['email'] ?? "");
 $userPassword = trim($_POST['password'] ?? "");
 $confirmPassword = trim($_POST['confirm_password'] ?? "");
 
-// For this project: students can self-register.
 $userRole = 'student';
 
 if ($userName === "" || $userEmail === "" || $userPassword === "" || $confirmPassword === "") {
@@ -42,6 +41,12 @@ if (strlen($userPassword) < 4) {
 
 if (isUsernameTaken($userName)) {
     $_SESSION['signup_error'] = 'Username already exists. Try another one.';
+    header('location: ../views/auth/signup.php');
+    exit();
+}
+
+if (isUserEmailTaken($userEmail)) {
+    $_SESSION['signup_error'] = 'Email already exists. Try another one.';
     header('location: ../views/auth/signup.php');
     exit();
 }

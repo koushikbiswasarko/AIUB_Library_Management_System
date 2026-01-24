@@ -1,27 +1,22 @@
 <?php
 require_once('db.php');
 
-// NOTE (for WebTech class):
-// This project uses simple mysqli_query() (no bind_param / prepared statements)
-// because many course templates don't cover prepared statements yet.
-
 function login($user){
-    $databaseConnection = getConnection();
+    $conn = getConnection();
 
-    $userName = trim($user['username'] ?? "");
-    $userPassword = trim($user['password'] ?? "");
+    $username = $user['username'];
+    $password = $user['password'];
 
-    if ($userName === "" || $userPassword === "") {
+    if($username == "" || $password == ""){
         return false;
     }
 
-    $safeUserName = mysqli_real_escape_string($databaseConnection, $userName);
-    $safePassword = mysqli_real_escape_string($databaseConnection, $userPassword);
+    $sql = "SELECT * FROM users 
+            WHERE BINARY username = '$username' AND BINARY password = '$password'";
 
-    $sqlQuery = "SELECT * FROM users WHERE username='$safeUserName' AND password='$safePassword' LIMIT 1";
-    $result = mysqli_query($databaseConnection, $sqlQuery);
+    $result = mysqli_query($conn, $sql);
 
-    if ($result && mysqli_num_rows($result) === 1) {
+    if($result && mysqli_num_rows($result) == 1){
         return mysqli_fetch_assoc($result);
     }
 
@@ -29,102 +24,95 @@ function login($user){
 }
 
 function getAllStudents(){
-    $databaseConnection = getConnection();
-    $sqlQuery = "SELECT id, username FROM users WHERE role='student' ORDER BY username ASC";
-    return mysqli_query($databaseConnection, $sqlQuery);
+    $conn = getConnection();
+    $sql = "SELECT id, username FROM users
+            WHERE role='student'
+            ORDER BY username ASC";
+    return mysqli_query($conn, $sql);
 }
 
 function getAllUsers(){
-    $databaseConnection = getConnection();
-    $sqlQuery = "SELECT id, username, email, role FROM users ORDER BY id DESC";
-    return mysqli_query($databaseConnection, $sqlQuery);
+    $conn = getConnection();
+    $sql = "SELECT id, username, email, role FROM users
+            ORDER BY role DESC";
+    return mysqli_query($conn, $sql);
 }
 
 function isUsernameTaken($username){
-    $databaseConnection = getConnection();
-    $userName = trim($username ?? "");
+    $conn = getConnection();
 
-    if ($userName === "") {
+    if($username == ""){
         return true;
     }
 
-    $safeUserName = mysqli_real_escape_string($databaseConnection, $userName);
-    $sqlQuery = "SELECT id FROM users WHERE username='$safeUserName' LIMIT 1";
-    $result = mysqli_query($databaseConnection, $sqlQuery);
+    $sql = "SELECT id FROM users WHERE username='$username'";
+    $result = mysqli_query($conn, $sql);
 
-    return ($result && mysqli_num_rows($result) > 0);
+    if($result && mysqli_num_rows($result) > 0){
+        return true;
+    }
+
+    return false;
+}
+
+function isUserEmailTaken($email){
+    $conn = getConnection();
+
+    if($email == ""){
+        return true;
+    }
+
+    $sql = "SELECT id FROM users WHERE email='$email'";
+    $result = mysqli_query($conn, $sql);
+
+    if($result && mysqli_num_rows($result) > 0){
+        return true;
+    }
+
+    return false;
 }
 
 function createUser($username, $password, $email, $role){
-    $databaseConnection = getConnection();
+    $conn = getConnection();
 
-    $userName = trim($username ?? "");
-    $userPassword = trim($password ?? "");
-    $userEmail = trim($email ?? "");
-    $userRole = trim($role ?? "student");
-
-    if ($userName === "" || $userPassword === "") {
+    if($username == "" || $password == ""){
         return false;
     }
 
-    // Only allow safe roles (keeps project simple)
-    $allowedRoles = ['student', 'librarian', 'admin'];
-    if (!in_array($userRole, $allowedRoles, true)) {
-        $userRole = 'student';
+    if($role == ""){
+        $role = "student";
     }
 
-    $safeUserName = mysqli_real_escape_string($databaseConnection, $userName);
-    $safePassword = mysqli_real_escape_string($databaseConnection, $userPassword);
-    $safeEmail = mysqli_real_escape_string($databaseConnection, $userEmail);
-    $safeRole = mysqli_real_escape_string($databaseConnection, $userRole);
+    $sql = "INSERT INTO users (username, password, email, role)
+            VALUES ('$username', '$password', '$email', '$role')";
 
-    // IMPORTANT: Your users table must have an email column.
-    $sqlQuery = "INSERT INTO users (username, password, email, role) VALUES ('$safeUserName', '$safePassword', '$safeEmail', '$safeRole')";
-    return mysqli_query($databaseConnection, $sqlQuery);
+    return mysqli_query($conn, $sql);
 }
 
-function updatePasswordByUsername($username, $newPassword){
-    $databaseConnection = getConnection();
-    $userName = trim($username ?? "");
-    $password = trim($newPassword ?? "");
+function deleteUser($userId){
+    $conn = getConnection();
 
-    if ($userName === "" || $password === "") {
+    $id = (int)$userId;
+    if($id <= 0){
         return false;
     }
 
-    $safeUserName = mysqli_real_escape_string($databaseConnection, $userName);
-    $safePassword = mysqli_real_escape_string($databaseConnection, $password);
-
-    $sqlQuery = "UPDATE users SET password='$safePassword' WHERE username='$safeUserName'";
-    $ok = mysqli_query($databaseConnection, $sqlQuery);
-    $affected = mysqli_affected_rows($databaseConnection);
-
-    return ($ok && $affected > 0);
+    $sql = "DELETE FROM users WHERE id=$id";
+    return mysqli_query($conn, $sql);
 }
 
-function deleteUserById($userId){
-    $databaseConnection = getConnection();
-    $id = (int)($userId ?? 0);
-    if ($id <= 0) {
-        return false;
-    }
-    $sqlQuery = "DELETE FROM users WHERE id=$id";
-    return mysqli_query($databaseConnection, $sqlQuery);
-}
+function updateUserRole($userId, $newRole){
+    $conn = getConnection();
 
-function updateUserRoleById($userId, $newRole){
-    $databaseConnection = getConnection();
-
-    $id = (int)($userId ?? 0);
-    $role = trim($newRole ?? "");
-    $allowedRoles = ['student', 'librarian', 'admin'];
-    if ($id <= 0 || !in_array($role, $allowedRoles, true)) {
+    $id = (int)$userId;
+    if($id <= 0 || $newRole == ""){
         return false;
     }
 
-    $safeRole = mysqli_real_escape_string($databaseConnection, $role);
-    $sqlQuery = "UPDATE users SET role='$safeRole' WHERE id=$id";
-    return mysqli_query($databaseConnection, $sqlQuery);
-}
+    $sql = "UPDATE users
+            SET role='$newRole'
+            WHERE id=$id";
 
+    return mysqli_query($conn, $sql);
+}
 ?>

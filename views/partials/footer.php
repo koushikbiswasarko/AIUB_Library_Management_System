@@ -1,7 +1,7 @@
 </div>
 
 <div class="footer">
-  © <?php echo date('Y'); ?> AIUB Library Management System
+  &copy; 2026 AIUB Library Management System
 </div>
 
 </body>

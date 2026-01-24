@@ -19,7 +19,7 @@ body {
 .box {
   background-color: white;
   border: 1px solid #cccccc;
-  padding: 15px;
+  padding: 10px;
   margin-bottom: 12px;
   border-radius: 5px;
 }
@@ -66,7 +66,7 @@ table {
 
 th, td {
   border: 1px solid #cccccc;
-  padding: 10px;
+  padding: 5px;
 }
 
 th {
@@ -91,6 +91,16 @@ button {
   cursor: pointer;
 }
 
+deletebutton {
+  width: 100%;
+  padding: 10px;
+  background-color: #a80000;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
 button:hover {
   background-color: #0b5ed7;
 }
@@ -99,4 +109,50 @@ button:hover {
   text-align: center;
   padding: 15px;
   color: gray;
+}
+
+.login-wrap {
+  max-width: 420px;
+  padding: 40px;
+  margin: 40px auto;
+}
+
+.login-title{margin:0 0 10px 0;}
+
+.inline-btn{
+  width:auto;
+  padding:10px 16px;
+}
+
+.small-text{
+  margin-top:12px;
+  font-size:14px;
+}
+
+.small-text a{
+  text-decoration:none;
+  color:#2e59d9;
+}
+
+.small-text a:hover{
+  text-decoration:underline;
+}
+
+.msg{
+  margin:10px 0;
+  padding:10px;
+  border-radius:6px;
+  font-size:14px;
+}
+
+.msg-success{
+  background:#e6ffed;
+  border:1px solid #b3ffcc;
+  color:#006b2e;
+}
+
+.msg-error{
+  background:#ffe6e6;
+  border:1px solid #ffb3b3;
+  color:#a80000;
 }

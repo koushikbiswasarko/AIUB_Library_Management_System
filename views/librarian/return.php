@@ -3,17 +3,17 @@ require_once('../../controllers/roleCheck.php');
 requireRole('librarian');
 require_once('../../models/db.php');
 
-$databaseConnection = getConnection();
+$conn = getConnection();
 
-$issuedBorrowingsQuery = "
+$sql = "
   SELECT br.id AS borrowing_id, br.due_date, u.username, b.title
   FROM borrowings br
-  JOIN users u ON br.user_id=u.id
-  JOIN books b ON br.book_id=b.id
+  JOIN users u ON br.user_id = u.id
+  JOIN books b ON br.book_id = b.id
   WHERE br.status='issued'
-  ORDER BY br.id DESC
+  ORDER BY br.due_date ASC
 ";
-$issuedBorrowingsResult = mysqli_query($databaseConnection, $issuedBorrowingsQuery);
+$result = mysqli_query($conn, $sql);
 
 require_once('../partials/header.php');
 ?>
@@ -26,42 +26,34 @@ require_once('../partials/header.php');
   <div style="flex:1;">
     <div class="box">
       <h2>Return Book</h2>
-      <p>Select issued record to return.</p>
-    </div>
+      <table border="1" cellpadding="8" cellspacing="0" width="100%">
+        <tr>
+          <th>Student</th>
+          <th>Book</th>
+          <th>Due Date</th>
+          <th>Action</th>
+        </tr>
 
-    <div class="box">
-      <form method="post" action="../../controllers/returnCheck.php">
-
-        <label>Select Issued Record</label>
-        <select name="borrow_id" id="borrow_id" onchange="setDueDateValue()" required>
-          <?php
-          $borrowDueDateMap = [];
-          while($issuedRow = mysqli_fetch_assoc($issuedBorrowingsResult)){
-              $borrowDueDateMap[$issuedRow['borrowing_id']] = $issuedRow['due_date'];
-          ?>
-            <option value="<?= $issuedRow['borrowing_id'] ?>">
-              ID: <?= $issuedRow['borrowing_id'] ?> | <?= htmlspecialchars($issuedRow['username']) ?> | <?= htmlspecialchars($issuedRow['title']) ?> | Due: <?= $issuedRow['due_date'] ?>
-            </option>
+        <?php if($result && mysqli_num_rows($result) > 0){ ?>
+          <?php while($row = mysqli_fetch_assoc($result)){ ?>
+            <tr>
+              <td><?php echo htmlspecialchars($row['username']); ?></td>
+              <td><?php echo htmlspecialchars($row['title']); ?></td>
+              <td><?php echo $row['due_date']; ?></td>
+              <td>
+                <form method="post" action="../../controllers/returnCheck.php" style="margin:0;">
+                  <input type="hidden" name="borrow_id" value="<?php echo $row['borrowing_id']; ?>">
+                  <button type="submit" name="submit">Return</button>
+                </form>
+              </td>
+            </tr>
           <?php } ?>
-        </select>
-
-        <input type="hidden" name="due_date" id="due_date" value="<?= count($borrowDueDateMap) ? reset($borrowDueDateMap) : '' ?>">
-
-        <br><br>
-        <button type="submit" name="submit">Return</button>
-      </form>
+        <?php } else { ?>
+          <tr><td colspan="4">No issued books found.</td></tr>
+        <?php } ?>
+      </table>
     </div>
-
   </div>
 </div>
-
-<script>
-var borrowDueDateMap = <?= json_encode($borrowDueDateMap) ?>;
-
-function setDueDateValue(){
-    var selectedBorrowId = document.getElementById("borrow_id").value;
-    document.getElementById("due_date").value = borrowDueDateMap[selectedBorrowId];
-}
-</script>
 
 <?php require_once('../partials/footer.php'); ?>

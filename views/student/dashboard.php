@@ -26,7 +26,7 @@ require_once('../partials/header.php');
     </div>
 
     <div class="stat">
-      <h2><?= $myIssuedBooks ?></h2>
+      <h2><?php echo $myIssuedBooks; ?></h2>
       <p>My Issued Books</p>
     </div>
   </div>

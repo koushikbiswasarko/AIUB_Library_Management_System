@@ -1,33 +1,45 @@
 <?php
 require_once('roleCheck.php');
 requireRole('librarian');
-require_once('../models/borrowModel.php');
+require_once('../models/db.php');
 
-if (!isset($_POST['submit'])) {
+if(!isset($_POST['submit'])){
     header('location: ../views/librarian/return.php');
     exit();
 }
 
 $borrowId = intval($_POST['borrow_id'] ?? 0);
-$dueDate = trim($_POST['due_date'] ?? "");
-
-if ($borrowId <= 0 || $dueDate === "") {
+if($borrowId <= 0){
     echo "Invalid input!";
     exit();
 }
 
-$todayDate = date('Y-m-d');
-$fineAmount = 0;
+$conn = getConnection();
 
-if (strtotime($todayDate) > strtotime($dueDate)) {
-    $daysLate = (strtotime($todayDate) - strtotime($dueDate)) / (60 * 60 * 24);
-    $fineAmount = intval($daysLate) * 5;
+$sql = "SELECT due_date FROM borrowings WHERE id={$borrowId} AND status='issued'";
+$result = mysqli_query($conn, $sql);
+
+if(!$result || mysqli_num_rows($result) == 0){
+    echo "Invalid input!";
+    exit();
 }
 
-$isReturned = returnBook($borrowId, $fineAmount);
+$row = mysqli_fetch_assoc($result);
+$dueDate = $row['due_date'];
 
-if ($isReturned) {
-    header('location: ../views/librarian/dashboard.php');
+$today = date('Y-m-d');
+$fine = 0;
+
+if(strtotime($today) > strtotime($dueDate)){
+    $daysLate = (strtotime($today) - strtotime($dueDate)) / (60*60*24);
+    $fine = intval($daysLate) * 5;
+}
+
+$sql2 = "UPDATE borrowings SET status='returned', fine={$fine}, return_date='{$today}' WHERE id={$borrowId}";
+$status = mysqli_query($conn, $sql2);
+
+if($status){
+    header('location: ../views/librarian/return.php');
     exit();
 }
 

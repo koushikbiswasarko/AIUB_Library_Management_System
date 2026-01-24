@@ -25,11 +25,12 @@ $userInput = [
 $userData = login($userInput);
 
 if (!$userData) {
-    echo "Invalid user!";
+    $_SESSION['login_error'] = "Wrong username or password!";
+    header('location: ../views/auth/login.php');
     exit();
 }
 
-setcookie('status', 'true', time() + 3000, '/');
+setcookie('status', 'true', time() + 7 * 24 * 60 * 60, '/');
 
 $_SESSION['username'] = $userData['username'];
 $_SESSION['role'] = $userData['role'];

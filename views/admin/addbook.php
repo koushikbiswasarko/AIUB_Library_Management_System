@@ -17,20 +17,16 @@ require_once('../partials/header.php');
 
     <div class="box">
       <form method="post" action="../../controllers/bookAddCheck.php">
-        <label>Book Title</label>
-        <input type="text" name="title" required>
+        <label style="padding: 10px;">Book Title: </label>
+        <input type="text" name="title" required style="width:35%">
+        <label style="padding: 10px;">Author Name: </label>
+        <input type="text" name="author" required style="width:35%">
         <br><br>
 
-        <label>Author Name</label>
-        <input type="text" name="author" required>
-        <br><br>
-
-        <label>Category</label>
-        <input type="text" name="category">
-        <br><br>
-
-        <label>Total Copies</label>
-        <input type="number" name="total_copies" value="1" min="1" required>
+        <label style="padding: 10px;">Category: </label>
+        <input type="text" name="category" style="width:35%">
+        <label style="padding: 10px;">Total Copies: </label>
+        <input type="number" name="total_copies" value="1" min="1" required style="width:35%">
         <br><br>
 
         <button type="submit" name="submit">Add Book</button>
